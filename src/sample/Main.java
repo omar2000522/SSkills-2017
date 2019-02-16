@@ -9,11 +9,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import javax.xml.bind.DatatypeConverter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
@@ -21,33 +26,54 @@ import java.sql.*;
 
 public class Main extends Application {
     Connection conn = null;
+    Stage window = null;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        window = primaryStage;
         conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/session1?useSSL=False", "root", "omar");
-        BorderPane root = new BorderPane();
-        TextField inputField = new TextField();
-        Label outputLabel = new Label();
-        Button hashButton = new Button("Hash");
-        VBox midBox = new VBox(inputField,outputLabel,hashButton);
-        midBox.setAlignment(Pos.CENTER);
-        midBox.setSpacing(20);
-        midBox.setPadding(new Insets(30));
-        root.setCenter(midBox);
-
-        hashButton.setOnAction(val -> {
-            try {
-                outputLabel.setText(md5Hasher(inputField.getText()));
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
-        });
-
-
-        primaryStage.setScene(new Scene(root, 400, 300));
-        primaryStage.show();
+        login0();
+//        BorderPane root = new BorderPane();
+//        TextField inputField = new TextField();
+//        Label outputLabel = new Label();
+//        Button hashButton = new Button("Hash");
+//        VBox midBox = new VBox(inputField,outputLabel,hashButton);
+//        midBox.setAlignment(Pos.CENTER);
+//        midBox.setSpacing(20);
+//        midBox.setPadding(new Insets(30));
+//        root.setCenter(midBox);
+//
+//        hashButton.setOnAction(val -> {
+//            try {
+//                outputLabel.setText(md5Hasher(inputField.getText()));
+//            } catch (NoSuchAlgorithmException e) {
+//                e.printStackTrace();
+//            }
+//        });
+//
+//
+//        primaryStage.setScene(new Scene(root, 400, 300));
+//        primaryStage.show();
     }
 
+    public void login0() throws FileNotFoundException {
+        window.setTitle("Login");
+        BorderPane root = new BorderPane();
+        Label userLabel = new Label("Username:");
+        Label passLabel = new Label("Password:");
+        TextField userField = new TextField();
+        TextField passField = new TextField();
+        VBox labels = new VBox(userLabel,passLabel);
+        VBox fields = new VBox(userField,passField);
+        HBox bothSides = new HBox(labels,fields);
+        ImageView logo = new ImageView(new Image(new FileInputStream("src\\Images\\WSC2017_TP09_color@4x.png")));
+
+        VBox mainBox = new VBox(logo,bothSides);
+
+        root.setCenter(mainBox);
+        window.setScene(new Scene(root, 800,600));
+        window.show();
+    }
 
     public ResultSet sqlExe(String query) throws SQLException {
         Statement stmnt = conn.createStatement();

@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -102,7 +103,7 @@ public class Main extends Application {
                     ResultSet user = sqlExe("SELECT password, active, roleid FROM Users WHERE email = '" + userField.getText() + "';");
                     if (user.next() && user.getString("Password").equals(md5Hasher(passField.getText()))) {
                         if (user.getInt("active") == 1) {
-                            if (user.getInt("roleid") == 1) System.out.println("ADMIN");
+                            if (user.getInt("roleid") == 1) adminMenu1();
                             if (user.getInt("roleid") == 2) System.out.println("NOT ADMIN");
                         }
                         else count.setText("Your acount has been deactivated");
@@ -147,12 +148,43 @@ public class Main extends Application {
         Button addButt = new Button("Add user");
         Button exitButt = new Button("Exit");
         HBox topBar = new HBox(addButt,exitButt);
-        Label officeLabel = new Label("Office:");
+        Label officeTitleLabel = new Label("Office:");
+        ComboBox officesCombo = new ComboBox();
+        HBox officesBox = new HBox(officeTitleLabel,officesCombo);
+        //------table-----
+        Label nameLabel = new Label("Name");
+        Label lastnameLabel = new Label("Last Name");
+        Label ageLabel = new Label("Age");
+        Label roleLabel = new Label("User Role");
+        Label emailLabel = new Label("Email Address");
+        Label officeLabel = new Label("Office");
+        VBox nameBox = new VBox(nameLabel);
+        VBox lastnameBox = new VBox(lastnameLabel);
+        VBox ageBox = new VBox(ageLabel);
+        VBox roleBox = new VBox(roleLabel);
+        VBox emailBox = new VBox(emailLabel);
+        VBox officeBox = new VBox(officeLabel);
+        HBox tableBox = new HBox(nameBox,lastnameBox,ageBox,roleBox,emailBox,officeBox);
+        //-------------
+        Button changeRoleButt = new Button("Change Role");
+        Button toggleButt = new Button("Enable/Disable Login");
+        HBox buttonsBox = new HBox(changeRoleButt,toggleButt);
+        VBox mainBox = new VBox(officeBox,tableBox,buttonsBox);
+
 
 
 
         //------------------proprieties-----------------------
-        //root.setCenter(mainBox);
+        topBar.setStyle("-fx-border-width: 0 0 1 0; -fx-border-color: black;");
+        tableBox.setStyle("-fx-border-width: 2; -fx-border-color: black;");
+        topBar.setSpacing(10);
+        mainBox.setSpacing(20);
+        buttonsBox.setSpacing(40);
+        topBar.setPadding(new Insets(2));
+        mainBox.setPadding(new Insets(15));
+        tableBox.setPadding(new Insets(5));
+        root.setTop(topBar);
+        root.setCenter(mainBox);
 
 
 

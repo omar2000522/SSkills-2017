@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -27,6 +28,8 @@ import java.sql.*;
 public class Main extends Application {
     Connection conn = null;
     Stage window = null;
+    int width = 800;
+    int height = 600;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -61,17 +64,103 @@ public class Main extends Application {
         BorderPane root = new BorderPane();
         Label userLabel = new Label("Username:");
         Label passLabel = new Label("Password:");
-        TextField userField = new TextField();
+        TextField userField = new TextField("j.doe@amonic.com");
         TextField passField = new TextField();
         VBox labels = new VBox(userLabel,passLabel);
         VBox fields = new VBox(userField,passField);
         HBox bothSides = new HBox(labels,fields);
         ImageView logo = new ImageView(new Image(new FileInputStream("src\\Images\\WSC2017_TP09_color@4x.png")));
+        Button loginButt = new Button("Login");
+        Button exitButt = new Button("Exit");
+        HBox buttsBox = new HBox(loginButt,exitButt);
+        Label count = new Label();
+        VBox mainBox = new VBox(logo,bothSides,buttsBox,count);
+        final int[] failedAttempts = {0};
+        final boolean[] canLogin = {true};
 
-        VBox mainBox = new VBox(logo,bothSides);
+
+        //------------------proprieties-----------------------
+        logo.setPreserveRatio(true);
+        count.setStyle("-fx-background-color: #ff5555");
+        logo.setFitWidth(width-400);
+        mainBox.setAlignment(Pos.CENTER);
+        buttsBox.setAlignment(Pos.CENTER);
+        bothSides.setAlignment(Pos.CENTER);
+        labels.setAlignment(Pos.CENTER_RIGHT);
+        fields.setAlignment(Pos.CENTER_LEFT);
+        mainBox.setSpacing(20);
+        labels.setSpacing(15);
+        fields.setSpacing(10);
+        buttsBox.setSpacing(20);
+        bothSides.setSpacing(5);
+
+
+        //-----------------------sql------------------------
+        loginButt.setOnAction(val -> {
+            if (canLogin[0]) {
+                try {
+                    ResultSet user = sqlExe("SELECT password, active, roleid FROM Users WHERE email = '" + userField.getText() + "';");
+                    if (user.next() && user.getString("Password").equals(md5Hasher(passField.getText()))) {
+                        if (user.getInt("active") == 1) {
+                            if (user.getInt("roleid") == 1) System.out.println("ADMIN");
+                            if (user.getInt("roleid") == 2) System.out.println("NOT ADMIN");
+                        }
+                        else count.setText("Your acount has been deactivated");
+                    } else if (failedAttempts[0] < 2) {
+                        count.setText("Incorrect Email or Password.");
+                        failedAttempts[0]++;
+                    } else {
+                        canLogin[0] = false;
+                        final int[] timeLeft = {10};
+                        Runnable countdown = () -> {
+                            while (timeLeft[0] > 0) {
+                                Platform.runLater(() -> count.setText("nah " + timeLeft[0] + " seconds remaining"));
+                                try {
+                                    Thread.sleep(1000);
+                                    timeLeft[0]--;
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            canLogin[0] = true;
+                            Platform.runLater(() -> count.setText(""));
+                        };
+                        Thread thrd = new Thread(countdown);
+                        thrd.start();
+                        failedAttempts[0] = 0;
+                    }
+                } catch (SQLException | NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         root.setCenter(mainBox);
-        window.setScene(new Scene(root, 800,600));
+        window.setScene(new Scene(root, width, height-200));
+        window.show();
+    }
+
+    public void adminMenu1(){
+        window.setTitle("Login");
+        BorderPane root = new BorderPane();
+        Button addButt = new Button("Add user");
+        Button exitButt = new Button("Exit");
+        HBox topBar = new HBox(addButt,exitButt);
+        Label officeLabel = new Label("Office:");
+
+
+
+        //------------------proprieties-----------------------
+        //root.setCenter(mainBox);
+
+
+
+        //-----------------------sql------------------------
+
+
+
+        window.setScene(new Scene(root, width, height-200));
         window.show();
     }
 

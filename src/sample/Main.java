@@ -142,7 +142,7 @@ public class Main extends Application {
         window.show();
     }
 
-    public void adminMenu1(){
+    public void adminMenu1() throws SQLException {
         window.setTitle("Login");
         BorderPane root = new BorderPane();
         Button addButt = new Button("Add user");
@@ -169,7 +169,7 @@ public class Main extends Application {
         Button changeRoleButt = new Button("Change Role");
         Button toggleButt = new Button("Enable/Disable Login");
         HBox buttonsBox = new HBox(changeRoleButt,toggleButt);
-        VBox mainBox = new VBox(officeBox,tableBox,buttonsBox);
+        VBox mainBox = new VBox(officesBox,tableBox,buttonsBox);
 
 
 
@@ -177,9 +177,14 @@ public class Main extends Application {
         //------------------proprieties-----------------------
         topBar.setStyle("-fx-border-width: 0 0 1 0; -fx-border-color: black;");
         tableBox.setStyle("-fx-border-width: 2; -fx-border-color: black;");
+        officesCombo.getItems().add("All offices");
+        officesCombo.getSelectionModel().select(0);
+        officesBox.setAlignment(Pos.CENTER_LEFT);
         topBar.setSpacing(10);
+        officesBox.setSpacing(10);
         mainBox.setSpacing(20);
         buttonsBox.setSpacing(40);
+        tableBox.setSpacing(30);
         topBar.setPadding(new Insets(2));
         mainBox.setPadding(new Insets(15));
         tableBox.setPadding(new Insets(5));
@@ -189,7 +194,7 @@ public class Main extends Application {
 
 
         //-----------------------sql------------------------
-
+        ResultSet users = sqlExe("");
 
 
         window.setScene(new Scene(root, width, height-200));
